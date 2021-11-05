@@ -1,45 +1,12 @@
-## Example app using MongoDB
+## UK Land Registry Map - Experimental App
 
-[MongoDB](https://www.mongodb.com/) is a general purpose, document-based, distributed database built for modern application developers and for the cloud era. This example will show you how to connect to and use MongoDB as your backend for your Next.js app.
+This app has been built to search and visualise land registry data relating to property sales in England.
 
-If you want to learn more about MongoDB, visit the following pages:
+This app uses [Next.js](https://nextjs.org/), [MongoDB](https://www.mongodb.com/) and publicly available [HM Land Registry data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads).
 
-- [MongoDB Atlas](https://mongodb.com/atlas)
-- [MongoDB Documentation](https://docs.mongodb.com/)
+This app uses and contains public sector information licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
 
-## Deploy your own
 
-Once you have access to the environment variables you'll need, deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-mongodb&project-name=with-mongodb&repository-name=with-mongodb&env=MONGODB_URI&envDescription=Required%20to%20connect%20the%20app%20with%20MongoDB)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example with-mongodb with-mongodb-app
-# or
-yarn create next-app --example with-mongodb with-mongodb-app
-```
-
-## Configuration
-
-### Set up a MongoDB database
-
-Set up a MongoDB database either locally or with [MongoDB Atlas for free](https://mongodb.com/atlas).
-
-### Set up environment variables
-
-Copy the `env.local.example` file in this directory to `.env.local` (which will be ignored by Git):
-
-```bash
-cp .env.local.example .env.local
-```
-
-Set each variable on `.env.local`:
-
-- `MONGODB_URI` - Your MongoDB connection string. If you are using [MongoDB Atlas](https://mongodb.com/atlas) you can find this by clicking the "Connect" button for your cluster.
 
 ### Run Next.js in development mode
 
@@ -59,15 +26,21 @@ You will either see a message stating "You are connected to MongoDB" or "You are
 
 When you are successfully connected, you can refer to the [MongoDB Node.js Driver docs](https://mongodb.github.io/node-mongodb-native/3.4/tutorials/collections/) for further instructions on how to query your database.
 
+
+
 ## Deploy on Vercel
 
 You can deploy this app to the cloud with [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+
+
 
 #### Deploy Your Local Project
 
 To deploy your local project to Vercel, push it to GitHub/GitLab/Bitbucket and [import to Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example).
 
 **Important**: When you import your project on Vercel, make sure to click on **Environment Variables** and set them to match your `.env.local` file.
+
+
 
 #### Deploy from Our Template
 
