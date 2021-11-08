@@ -1,11 +1,28 @@
-## UK Land Registry Map - Experimental App
+## Search UK Land Registry Property Sales (experimental)
 
-This app has been built to search and visualise land registry data relating to property sales in England.
+This web application has been built to search and visualise property sales in England and Wales.
 
-This app uses [Next.js](https://nextjs.org/), [MongoDB](https://www.mongodb.com/) and publicly available [HM Land Registry data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads).
+It uses [Next.js](https://nextjs.org/), [MongoDB](https://www.mongodb.com/) and publicly available [HM Land Registry data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
 
-This app uses and contains public sector information licensed under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
+Map data provided by &copy; [OpenSteetMap contributors](https://www.openstreetmap.org/copyright)
 
+
+### Other credits
+
+- [OpenLayers v6.9.0](https://openlayers.org/)
+- [Tailwind CSS v2.2.19](https://tailwindcss.com/)
+- [How to Use OpenLayers Maps in React](https://medium.com/swlh/how-to-incorporate-openlayers-maps-into-react-65b411985744) by Matthew Brown
+
+
+## Importing CSV Data
+
+Bulk importing of csv data requires using mongoimport tool with the following command (depending on shape of data in csv file used):
+
+```
+// Requires following headertypes in first row of the csv file: id.string(),propertyClassification.string(),saleDate.date(2006-01-02),saleValue.int32(),lon.double(),lat.double(),postcode.string(),line1.string(),line2.string(),city.string(),county.string()
+mongoimport --uri "mongodb+srv://USER:PASSWORD@cluster0.cxqgg.mongodb.net/DB_NAME?retryWrites=true&w=majority" --collection COLLECTION_NAME --type csv --file FILE_NAME --headerline --columnsHaveTypes
+
+```
 
 
 ### Run Next.js in development mode

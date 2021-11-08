@@ -1,0 +1,93 @@
+@tailwind base;
+
+/************************
+ *  Custom Styles 
+ * **********************/
+
+/** 
+ * react-dates date picker overrides 
+ * */
+
+.CalendarDay__selected_span {
+  background: rgba(67, 56, 202, 0.8);
+  color: #ffffff;
+  border: 1px solid $light-red;
+}
+
+.CalendarDay__selected {
+  background: $dark-red;
+  color: #ffffff;
+}
+
+
+.CalendarDay__selected:hover {
+  background: orange;
+  color: #ffffff;
+}
+
+.CalendarDay__hovered_span:hover,
+.CalendarDay__hovered_span {
+  background: brown;
+}
+
+
+
+/** 
+ * Open Layers Map Defaults 
+ * */
+
+.ol-map {
+  position: absolute !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+.ol-control {
+  position: absolute;
+  background-color: rgba(255,255,255,0.4);
+  border-radius: 4px;
+  padding: 8px;
+}
+.ol-full-screen {
+  top: 1em;
+  right: 1em;
+}
+
+
+
+/** 
+ * Property classification map marker circles 
+ * */
+
+.bg-circle-detached {
+  background-color: rgba(19, 3, 92, .6);
+}
+
+.bg-circle-semi-detached {
+  background-color: rgba(40, 141, 88, .6);
+}
+
+.bg-circle-flat {
+  background-color: rgba(188, 80, 144, .6);
+}
+
+.bg-circle-terrace {
+  background-color: rgba(235, 95, 94, .6);
+}
+
+.bg-circle-other {
+  background-color: rgba(243, 165, 51, .6);
+}
+
+
+
+/* Start purging... */
+@tailwind components;
+/* Stop purging. */
+
+/* Write you own custom component styles here */
+
+/* Start purging... */
+@tailwind utilities;
+/* Stop purging. */
+
+/* Your own custom utilities */

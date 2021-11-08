@@ -1,239 +1,150 @@
-import Head from 'next/head'
-import clientPromise from '../lib/mongodb'
+import React from "react";
+import Head from 'next/head';
+import SearchForm from '../components/forms/searchForm';
+import moment from 'moment';
+import dynamic from 'next/dynamic';
 
-export default function Home({ isConnected }) {
-  return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import FeatureStyles from "../components/openLayers/features/styles";
+import mapConfig from "../components/openLayers/config.json";
+const OpenLayersMap = dynamic(() => import('../components/openLayers/openLayersMap'),{ ssr: false });
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
-        </h1>
 
-        {isConnected ? (
-          <h2 className="subtitle">You are connected to MongoDB</h2>
-        ) : (
-          <h2 className="subtitle">
-            You are NOT connected to MongoDB. Check the <code>README.md</code>{' '}
-            for instructions.
-          </h2>
-        )}
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
+export default function Home() {
 
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
 
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+	// Map Configuration
+	const [vectorObjects, setVectorObjects] = React.useState([]);
+  	const [mapCenter, setMapCenter] = React.useState(mapConfig.center);
+  	const [mapZoom, setMapZoom] = React.useState(7);
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
 
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+	// Form state
+	const [state, setState] = React.useState({
+		isSubmitting: false, // Whether the form is being submitted
+		searchResultCount: 0 // How many total land sale records were found
+  	});
 
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
+  	let startDate = moment().subtract(2,'months');
+	let endDate = moment().subtract(1,'months');
 
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
 
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
+  	// Send initial search request to populate the map
+  	const [defaultSearchComplete, setDefaultSearchComplete] = React.useState(false);
 
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+  	let defaultSearchData = {
+	    "startDate": new Date(startDate),
+	    "endDate": new Date(endDate),
+	    "propertyClassDetached": true,
+	    "propertyClassSemiDetached": true,
+	    "propertyClassFlat": true,
+	    "propertyClassTerrace": true,
+	    "propertyClassOther": true
+	}
 
-        footer img {
-          margin-left: 0.5rem;
-        }
+	if(!defaultSearchComplete){
+		setDefaultSearchComplete(true);
+		sendSearchRequest(defaultSearchData);
+	}
 
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
 
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
+  	// Handle search form submission
+	function onSearchSubmitHandler(searchData){
+		sendSearchRequest(searchData);
+	}
 
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
 
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
+	// Submit the actual search request to API and build map layers with response
+	async function sendSearchRequest(searchData){
+		setState({...state,'isSubmitting': true});
 
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
+		const res = await fetch('/api/search', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(searchData),
+		});
 
-        .title,
-        .description {
-          text-align: center;
-        }
+		const result = await res.json();
 
-        .subtitle {
-          font-size: 2rem;
-        }
+		// Set the styles to be used on map vector layers
+		let vectorData = [];
 
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
+		// The land sale data returned is grouped into feature collections by property classification so that unique styling can be applied per classification on the map
+		// We apply the unique style here after getting the search response back from the api
+		if(result.result.length){
+			result.result.map((geoJsonObject) => {
+				vectorData.push({style: FeatureStyles.PropertyClassifications[geoJsonObject.features[0].properties.classificationId], geoJsonObject});
+			})
+		}
 
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
+		// Bind the vector layers to be used by the openLayersMap component
+		setVectorObjects(vectorData);
 
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
+		// Update form state
+		setState({...state, 'searchResultCount': result.summary.count, 'isSubmitting': false});
+	}
 
-          max-width: 800px;
-          margin-top: 3rem;
-        }
 
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
+	return (
+		<div className="container">
+			<Head>
+				<title>UK Land Registry Map Search</title>
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
 
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
+			<main>
 
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
+				<section className="grid grid-cols-1 md:grid-cols-3 h-screen">
 
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
+					<div className="flex flex-col justify-between bg-gray-100 border-r-2 border-gray-200 pt-6 pb-4 pl-6 pr-6 md:pt-12 md:pb-6 md:pl-14 md:pr-14">
 
-        .logo {
-          height: 1em;
-        }
+						<section className="flex-grow">
+							<section className="mb-8">
+								<h1 className="mb-6 text-2xl md:text-4xl font-bold tracking-tighter leading-tight md:pr-8">
+									Search the entire history of property sales in England and Wales.
+								</h1>
 
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
+								<p className="text-sm text-gray-500 mb-4">Contains public sector information licensed under the <a className="hover:underline" target="_BLANK" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>.</p>
+								<p className="text-sm text-gray-500">Map data provided by &copy; <a className="hover:underline" target="_BLANK" href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></p>
 
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
+							</section>
 
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  )
-}
 
-export async function getServerSideProps(context) {
-  const client = await clientPromise
+							<section className="mt-3 mb-3">
+								<SearchForm 
+									onSearchSubmit={onSearchSubmitHandler} 
+									isSubmitting={state.isSubmitting} 
+									startDate={startDate} 
+									endDate={endDate} />
+							</section>
 
-  // client.db() will be the default database passed in the MONGODB_URI
-  // You can change the database by calling the client.db() function and specifying a database like:
-  // const db = client.db("myDatabase");
-  // Then you can execute queries against your database like so:
-  // db.find({}) or any of the MongoDB Node Driver commands
 
-  const isConnected = await client.isConnected()
+							<section className="mt-3 mb-3">
+								<h3 className="mb-3 md:text-2xl font-bold tracking-tighter leading-tight">Total sales displayed: {state.searchResultCount.toLocaleString()}</h3>
+								<p className="text-xs text-gray-500 mt-1 italic">(results are limited to max. 10,000 for performance)</p>
+							</section>
 
-  return {
-    props: { isConnected },
-  }
+						</section>
+
+
+						<section className="">
+							<p className="text-sm text-gray-500">Built by P Mardell. <a className="hover:underline" target="_BLANK" href="https://github.com/mrpetem/uk-land-registry-map">View source code &raquo;</a></p>
+						</section>
+
+					</div>
+
+					<div className="">
+						<OpenLayersMap center={mapCenter} zoom={mapZoom} vectorObjects={vectorObjects} />
+					</div>
+
+				</section>
+
+			</main>
+
+			<footer>
+			</footer>
+		</div>
+	)
 }
