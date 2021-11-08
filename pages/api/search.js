@@ -25,8 +25,11 @@ export default async function handler(req, res) {
 
 	try{
 
-		const maxResults = 10000; // Maximum number of results to return from a search
+
+
+		const maxMapFeatures = 10000; // Maximum number of geoJSON feature objects to create for map
 		let { startDate, endDate, propertyClassDetached, propertyClassSemiDetached, propertyClassFlat, propertyClassTerrace, propertyClassOther } = req.body;
+
 
 
 		/*
@@ -38,6 +41,7 @@ export default async function handler(req, res) {
 			!moment(endDate, moment.ISO_8601).isValid()){
 			return res.status(400).json({ summary: {count: 0}, result: [], error: 'You sent an invalid start date and/or end date.'});
 		}
+
 
 
 		/*
@@ -82,14 +86,17 @@ export default async function handler(req, res) {
 		}
 
 
+
 		// Perform search in database
 		const dbConn = await clientPromise;
 		const db = dbConn.db();
 
-		// Run query to find results, order by classification for easier grouping into geoJSON and convert result to array
-		const landSaleEntries = await db.collection('propertySales').find(findParams).sort({ saleDate : 1 }).limit(maxResults).toArray();
+		// Find total results available for the given search
+		const totalResults = await db.collection('propertySales').find(findParams).count();
 
-		const totalResults = landSaleEntries.length;
+		// Get documents found by search params, ordered by sale date for ensuring more random distribution of classifications returned
+		const landSaleEntries = await db.collection('propertySales').find(findParams).sort({ saleDate : 1 }).limit(maxMapFeatures).toArray();
+
 
 
 		/*
@@ -129,6 +136,7 @@ export default async function handler(req, res) {
 
 			mapFeatures.push(newMapFeature);
 		}
+
 
 
 		// Return response object containing results

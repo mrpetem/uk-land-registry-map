@@ -122,8 +122,8 @@ export default function Home() {
 
 
 							<section className="mt-3 mb-3">
-								<h3 className="mb-3 md:text-2xl font-bold tracking-tighter leading-tight">Total sales displayed: {state.searchResultCount.toLocaleString()}</h3>
-								<p className="text-xs text-gray-500 mt-1 italic">(results are limited to max. 10,000 for performance)</p>
+								<h3 className="mb-3 md:text-2xl font-bold tracking-tighter leading-tight">Total sales: {state.searchResultCount.toLocaleString()}</h3>
+								<p className="text-xs text-gray-500 mt-1 italic">(max. of 10,000 are rendered on the map for performance)</p>
 							</section>
 
 						</section>

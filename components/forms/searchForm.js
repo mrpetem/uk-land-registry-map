@@ -12,14 +12,15 @@ function SearchForm(props) {
 	const propertyClassTerraceRef = useRef();
 	const propertyClassOtherRef = useRef();
 
-	let startDate = props.startDate;
-	let endDate = props.endDate;
+
+	const [startDate, setStartDate] = React.useState(props.startDate);
+	const [endDate, setEndDate] = React.useState(props.endDate);
 
 
 
 	function onDatesSelectedHandler(startDateVal,endDateVal){
-		startDate = startDateVal;
-		endDate = endDateVal;
+		setStartDate(startDateVal);
+		setEndDate(endDateVal);
 	}
 
 
